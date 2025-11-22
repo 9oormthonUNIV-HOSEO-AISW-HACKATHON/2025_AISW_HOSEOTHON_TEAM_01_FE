@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Image } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -40,7 +40,7 @@ export default function SignupScreen({ navigation }: { navigation: any }) {
                 <ScrollView contentContainerStyle={styles.scrollContainer}>
                     <View style={styles.header}>
                         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                            <Text style={styles.backButtonText}>←</Text>
+                            <Image source={require('./assets/back.png')} style={styles.backIcon} resizeMode="contain" />
                         </TouchableOpacity>
                     </View>
 
@@ -147,6 +147,10 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 3,
+    },
+    backIcon: {
+        width: 24,
+        height: 24,
     },
     backButtonText: {
         fontSize: 20,

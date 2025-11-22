@@ -24,7 +24,7 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
                 <ScrollView contentContainerStyle={styles.scrollContainer}>
                     <View style={styles.header}>
                         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                            <Text style={styles.backButtonText}>←</Text>
+                            <Image source={require('./assets/back.png')} style={styles.backIcon} resizeMode="contain" />
                         </TouchableOpacity>
                     </View>
 
@@ -117,6 +117,10 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 3,
+    },
+    backIcon: {
+        width: 24,
+        height: 24,
     },
     backButtonText: {
         fontSize: 20,

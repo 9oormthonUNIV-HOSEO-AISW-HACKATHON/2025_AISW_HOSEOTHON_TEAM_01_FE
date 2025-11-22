@@ -165,7 +165,7 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
             <View style={styles.contentContainer}>
                 {activeTab === 'home' ? renderHomeContent() :
                     activeTab === 'news' ? renderNewsContent() :
-                        activeTab === 'report' ? <ReportScreen /> :
+                        activeTab === 'report' ? <ReportScreen navigation={navigation} /> :
                             <View style={styles.centerContent}><Text>준비 중입니다</Text></View>}
             </View>
 

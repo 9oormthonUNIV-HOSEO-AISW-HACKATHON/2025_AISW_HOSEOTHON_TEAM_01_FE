@@ -9,6 +9,7 @@ import NewsDetailScreen from './NewsDetailScreen';
 import MyPageScreen from './MyPageScreen';
 import SurveyScreen from './SurveyScreen';
 import SurveyResultScreen from './SurveyResultScreen';
+import ArticleWithSurveyScreen from './ArticleWithSurveyScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -54,6 +55,11 @@ export default function App() {
         <Stack.Screen
           name="SurveyResult"
           component={SurveyResultScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ArticleWithSurvey"
+          component={ArticleWithSurveyScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

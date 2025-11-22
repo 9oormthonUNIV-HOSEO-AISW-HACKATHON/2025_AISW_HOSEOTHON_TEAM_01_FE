@@ -18,7 +18,7 @@ export default function NewsDetailScreen({ route, navigation }: { route: any, na
         <SafeAreaContext style={styles.container}>
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <Text style={styles.backButtonText}>←</Text>
+                    <Image source={require('./assets/back.png')} style={styles.backIcon} resizeMode="contain" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle} numberOfLines={1}>{title}</Text>
             </View>
@@ -83,10 +83,11 @@ const styles = StyleSheet.create({
     },
     backButton: {
         marginRight: 10,
+        padding: 5,
     },
-    backButtonText: {
-        fontSize: 24,
-        color: '#333',
+    backIcon: {
+        width: 24,
+        height: 24,
     },
     headerTitle: {
         fontSize: 16,

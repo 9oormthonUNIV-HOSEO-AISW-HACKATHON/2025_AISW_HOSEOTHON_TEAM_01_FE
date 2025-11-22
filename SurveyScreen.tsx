@@ -35,7 +35,7 @@ export default function SurveyScreen({ route, navigation }: { route: any, naviga
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <Text style={styles.backButtonText}>←</Text>
+                    <Image source={require('./assets/back.png')} style={styles.backIcon} resizeMode="contain" />
                 </TouchableOpacity>
                 <Image
                     source={require('./assets/splash-icon.png')}
@@ -101,11 +101,11 @@ const styles = StyleSheet.create({
         backgroundColor: '#F8F9FA',
     },
     backButton: {
-        width: 40,
+        padding: 5,
     },
-    backButtonText: {
-        fontSize: 24,
-        color: '#333',
+    backIcon: {
+        width: 24,
+        height: 24,
     },
     headerLogo: {
         width: 100,

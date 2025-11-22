@@ -15,10 +15,11 @@ interface ReportNewsItemProps {
     badgeText: string;
     badgeColor: string;
     badgeTextColor: string;
+    onPress?: () => void;
 }
 
-const ReportNewsItem = ({ category, time, title, imageUrl, badgeText, badgeColor, badgeTextColor }: ReportNewsItemProps) => (
-    <View style={styles.newsItemContainer}>
+const ReportNewsItem = ({ category, time, title, imageUrl, badgeText, badgeColor, badgeTextColor, onPress }: ReportNewsItemProps) => (
+    <TouchableOpacity style={styles.newsItemContainer} onPress={onPress}>
         {/* Top Row: Category, Time, Badge */}
         <View style={styles.newsHeaderRow}>
             <View style={styles.categoryTimeContainer}>
@@ -37,10 +38,10 @@ const ReportNewsItem = ({ category, time, title, imageUrl, badgeText, badgeColor
             <Image source={{ uri: imageUrl }} style={styles.newsImage} resizeMode="cover" />
             <Text style={styles.newsTitle} numberOfLines={2}>{title}</Text>
         </View>
-    </View>
+    </TouchableOpacity>
 );
 
-export default function ReportScreen() {
+export default function ReportScreen({ navigation }: { navigation: any }) {
     const [selectedCategory, setSelectedCategory] = useState('전체');
 
     return (
@@ -85,6 +86,12 @@ export default function ReportScreen() {
                         badgeText="🤝 세대 의견 차이↓"
                         badgeColor="#FFF8E1"
                         badgeTextColor="#F57C00"
+                        onPress={() => navigation.navigate('ArticleWithSurvey', {
+                            title: "'구더기 방치' 부사관 아내, 끝내 사망.. 유족 \"가족들 못오게 했다\"",
+                            imageUrl: 'https://via.placeholder.com/300x160',
+                            category: '사회',
+                            time: '1시간 전'
+                        })}
                     />
                     <ReportNewsItem
                         category="사회"
@@ -94,6 +101,12 @@ export default function ReportScreen() {
                         badgeText="📌 관심도 높음"
                         badgeColor="#F3E5F5"
                         badgeTextColor="#7B1FA2"
+                        onPress={() => navigation.navigate('ArticleWithSurvey', {
+                            title: '"물티슈 판매 전면 금지" 정부 선포... 내년부터 영국 전역서 시행',
+                            imageUrl: 'https://via.placeholder.com/300x160',
+                            category: '사회',
+                            time: '1시간 전'
+                        })}
                     />
                     <ReportNewsItem
                         category="사회"
@@ -103,6 +116,12 @@ export default function ReportScreen() {
                         badgeText="⚡ 세대 의견 차이↑"
                         badgeColor="#FFF3E0"
                         badgeTextColor="#FF6D00"
+                        onPress={() => navigation.navigate('ArticleWithSurvey', {
+                            title: '쿠팡 동탄 물류센터서 30대 근로자 사망...사측 "지병 있어"',
+                            imageUrl: 'https://via.placeholder.com/300x160',
+                            category: '사회',
+                            time: '1시간 전'
+                        })}
                     />
                 </View>
 
