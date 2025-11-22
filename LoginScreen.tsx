@@ -1,0 +1,172 @@
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, Image, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+
+export default function LoginScreen({ navigation }: { navigation: any }) {
+    const [id, setId] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleLogin = () => {
+        if (id === '123' && password === '123') {
+            navigation.replace('Home');
+        } else {
+            alert('아이디 또는 비밀번호를 확인해주세요.\n(테스트 계정: 123 / 123)');
+        }
+    };
+
+    return (
+        <SafeAreaView style={styles.container}>
+            <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                style={styles.keyboardAvoidingView}
+            >
+                <ScrollView contentContainerStyle={styles.scrollContainer}>
+                    <View style={styles.header}>
+                        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                            <Text style={styles.backButtonText}>←</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.logoContainer}>
+                        <Image
+                            source={require('./assets/splash-icon.png')}
+                            style={styles.logo}
+                            resizeMode="contain"
+                        />
+                    </View>
+
+                    <View style={styles.formContainer}>
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.label}>ID</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="아이디를 입력해주세요"
+                                placeholderTextColor="#C4C4C4"
+                                value={id}
+                                onChangeText={setId}
+                                autoCapitalize="none"
+                            />
+                        </View>
+
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.label}>비밀번호</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="비밀번호를 입력해주세요"
+                                placeholderTextColor="#C4C4C4"
+                                secureTextEntry
+                                value={password}
+                                onChangeText={setPassword}
+                            />
+                        </View>
+                    </View>
+
+                    <View style={styles.footer}>
+                        <TouchableOpacity
+                            style={styles.loginButton}
+                            onPress={handleLogin}
+                        >
+                            <Text style={styles.loginButtonText}>로그인하기</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={styles.signupButton}
+                            onPress={() => navigation.navigate('Signup')}
+                        >
+                            <Text style={styles.signupButtonText}>회원가입하기</Text>
+                        </TouchableOpacity>
+                    </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
+            <StatusBar style="dark" />
+        </SafeAreaView>
+    );
+}
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#F8F9FA',
+    },
+    keyboardAvoidingView: {
+        flex: 1,
+    },
+    scrollContainer: {
+        flexGrow: 1,
+        paddingHorizontal: 24,
+        paddingBottom: 40,
+    },
+    header: {
+        marginTop: 20,
+        marginBottom: 20,
+        alignItems: 'flex-start',
+    },
+    backButton: {
+        padding: 5,
+        marginLeft: -5,
+    },
+    backButtonText: {
+        fontSize: 28,
+        color: '#333',
+    },
+    logoContainer: {
+        alignItems: 'center',
+        marginBottom: 40,
+    },
+    logo: {
+        width: 120,
+        height: 120,
+    },
+    formContainer: {
+        flex: 1,
+    },
+    inputGroup: {
+        marginBottom: 24,
+    },
+    label: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#000',
+        marginBottom: 8,
+    },
+    input: {
+        backgroundColor: '#FFFFFF',
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        borderRadius: 8,
+        paddingVertical: 14,
+        paddingHorizontal: 16,
+        fontSize: 16,
+        color: '#333',
+    },
+    footer: {
+        marginTop: 40,
+        gap: 12,
+    },
+    loginButton: {
+        backgroundColor: '#2948FF',
+        borderRadius: 12,
+        paddingVertical: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    loginButtonText: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    signupButton: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        paddingVertical: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: '#888',
+    },
+    signupButtonText: {
+        color: '#555',
+        fontSize: 16,
+        fontWeight: '500',
+    },
+});
