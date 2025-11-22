@@ -5,6 +5,10 @@ import StartScreen from './StartScreen';
 import SignupScreen from './SignupScreen';
 import LoginScreen from './LoginScreen';
 import HomeScreen from './HomeScreen';
+import NewsDetailScreen from './NewsDetailScreen';
+import MyPageScreen from './MyPageScreen';
+import SurveyScreen from './SurveyScreen';
+import SurveyResultScreen from './SurveyResultScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -30,6 +34,26 @@ export default function App() {
         <Stack.Screen
           name="Home"
           component={HomeScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="NewsDetail"
+          component={NewsDetailScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="MyPage"
+          component={MyPageScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Survey"
+          component={SurveyScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SurveyResult"
+          component={SurveyResultScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

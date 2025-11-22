@@ -17,6 +17,7 @@ interface NewsCardProps {
         change: string;
     };
     layout?: 'vertical' | 'horizontal';
+    onPress?: () => void;
 }
 
 export default function NewsCard({
@@ -30,11 +31,12 @@ export default function NewsCard({
     categoryColor = '#E8F0FE',
     categoryTextColor = '#1A73E8',
     overlayInfo,
-    layout = 'vertical'
+    layout = 'vertical',
+    onPress
 }: NewsCardProps) {
     if (layout === 'horizontal') {
         return (
-            <TouchableOpacity style={styles.horizontalContainer}>
+            <TouchableOpacity style={styles.horizontalContainer} onPress={onPress}>
                 <View style={styles.horizontalImageContainer}>
                     {imageUrl ? (
                         <Image source={{ uri: imageUrl }} style={styles.image} resizeMode="cover" />
@@ -61,7 +63,7 @@ export default function NewsCard({
     }
 
     return (
-        <TouchableOpacity style={styles.container}>
+        <TouchableOpacity style={styles.container} onPress={onPress}>
             <View style={styles.header}>
                 <View style={styles.tagContainer}>
                     <View style={[styles.tag, { backgroundColor: categoryColor }]}>

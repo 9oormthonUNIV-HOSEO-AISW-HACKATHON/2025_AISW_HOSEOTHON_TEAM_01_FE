@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Dimensions
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import NewsCard from './components/NewsCard';
+import ReportScreen from './ReportScreen';
 
 const { width } = Dimensions.get('window');
 
@@ -42,6 +43,12 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
                     price: "129,744,000.00",
                     change: "▼ -152,000.00 -0.12%"
                 }}
+                onPress={() => navigation.navigate('NewsDetail', {
+                    title: '비트코인, 1억3000만원도 붕괴...블룸버그 "추가 하락 가능"',
+                    imageUrl: 'https://via.placeholder.com/300x160',
+                    category: '경제',
+                    time: '1시간 전'
+                })}
             />
 
             <NewsCard
@@ -51,6 +58,12 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
                 badgeText="⚡ 세대 의견 차이↑"
                 badgeColor="#FFF3E0"
                 badgeTextColor="#FF6D00"
+                onPress={() => navigation.navigate('NewsDetail', {
+                    title: '쿠팡 동탄 물류센터서 30대 근로자 사망...사측 "지병 있어"',
+                    imageUrl: 'https://via.placeholder.com/300x160', // Assuming image exists or placeholder
+                    category: '사회',
+                    time: '2시간 전'
+                })}
             />
 
             <View style={{ height: 20 }} />
@@ -90,6 +103,12 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
                     badgeText="⚡ 세대 의견 차이↑"
                     badgeColor="#FFF3E0"
                     badgeTextColor="#FF6D00"
+                    onPress={() => navigation.navigate('NewsDetail', {
+                        title: '쿠팡 동탄 물류센터서 30대 근로자 사망...사측 "지병 있어"',
+                        imageUrl: 'https://via.placeholder.com/300x160',
+                        category: selectedCategory,
+                        time: '2시간 전'
+                    })}
                 />
 
                 <View style={styles.divider} />
@@ -103,6 +122,12 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
                     badgeText="🤝 세대 의견 차이↓"
                     badgeColor="#FFF8E1"
                     badgeTextColor="#F57C00"
+                    onPress={() => navigation.navigate('NewsDetail', {
+                        title: "'구더기 방치' 부사관 아내, 끝내 사망.. 유족 \"가족들 못오게 했다\"",
+                        imageUrl: 'https://via.placeholder.com/80',
+                        category: selectedCategory,
+                        time: '1시간 전'
+                    })}
                 />
 
                 <NewsCard
@@ -114,6 +139,12 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
                     badgeText="📌 관심도 높음"
                     badgeColor="#F3E5F5"
                     badgeTextColor="#7B1FA2"
+                    onPress={() => navigation.navigate('NewsDetail', {
+                        title: '"물티슈 판매 전면 금지" 정부 선포... 내년부터 영국 전역서 시행',
+                        imageUrl: 'https://via.placeholder.com/80',
+                        category: selectedCategory,
+                        time: '1시간 전'
+                    })}
                 />
 
                 <View style={{ height: 20 }} />
@@ -134,7 +165,8 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
             <View style={styles.contentContainer}>
                 {activeTab === 'home' ? renderHomeContent() :
                     activeTab === 'news' ? renderNewsContent() :
-                        <View style={styles.centerContent}><Text>준비 중입니다</Text></View>}
+                        activeTab === 'report' ? <ReportScreen /> :
+                            <View style={styles.centerContent}><Text>준비 중입니다</Text></View>}
             </View>
 
             {/* Bottom Navigation Bar */}
@@ -163,7 +195,7 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
                     />
                     <Text style={[styles.navText, activeTab === 'report' && styles.activeNavText]}>리포트</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem} onPress={() => setActiveTab('mypage')}>
+                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('MyPage')}>
                     <Image
                         source={activeTab === 'mypage' ? require('./assets/mypage_icon.png') : require('./assets/n_mypage_icon.png')}
                         style={styles.navIcon}
@@ -195,7 +227,7 @@ const styles = StyleSheet.create({
     header: {
         paddingHorizontal: 20,
         paddingTop: 20,
-        paddingBottom: 10,
+        paddingBottom: 0,
         backgroundColor: '#F8F9FA',
     },
     logo: {
