@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, Image, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function LoginScreen({ navigation }: { navigation: any }) {
     const [id, setId] = useState('');
@@ -29,7 +30,7 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
 
                     <View style={styles.logoContainer}>
                         <Image
-                            source={require('./assets/splash-icon.png')}
+                            source={require('./assets/logo2.png')}
                             style={styles.logo}
                             resizeMode="contain"
                         />
@@ -102,20 +103,33 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
     },
     backButton: {
-        padding: 5,
-        marginLeft: -5,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: '#FFFFFF',
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
     },
     backButtonText: {
-        fontSize: 28,
+        fontSize: 20,
         color: '#333',
+        fontWeight: 'bold',
     },
     logoContainer: {
         alignItems: 'center',
         marginBottom: 40,
     },
     logo: {
-        width: 120,
-        height: 120,
+        width: 108,
+        height: 108,
     },
     formContainer: {
         flex: 1,

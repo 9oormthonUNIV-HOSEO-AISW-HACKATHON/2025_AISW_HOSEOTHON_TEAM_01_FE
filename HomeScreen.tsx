@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, SafeAreaView, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import NewsCard from './components/NewsCard';
 
 const { width } = Dimensions.get('window');
@@ -15,7 +16,7 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
         <ScrollView contentContainerStyle={styles.scrollContent}>
             <View style={styles.welcomeSection}>
                 <Text style={styles.welcomeTitle}>
-                    <Text style={styles.highlight}>NEWNEW</Text>한 <Text style={styles.highlight}>시선</Text>으로{'\n'}
+                    <Text style={styles.highlight}>NEWNEW한</Text> <Text style={styles.highlight}>시선</Text>으로{'\n'}
                     오늘의 뉴스를 만나보세요!
                 </Text>
                 <Text style={styles.welcomeSubtitle}>
