@@ -1,12 +1,125 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, SafeAreaView, Dimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { Ionicons, FontAwesome5, MaterialIcons } from '@expo/vector-icons';
+import NewsCard from './components/NewsCard';
 
 const { width } = Dimensions.get('window');
 
+const CATEGORIES = ['전체', '정치', '경제', '사회', '생활', 'IT'];
+
 export default function HomeScreen({ navigation }: { navigation: any }) {
     const [activeTab, setActiveTab] = useState('home');
+    const [selectedCategory, setSelectedCategory] = useState('사회');
+
+    const renderHomeContent = () => (
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+            <View style={styles.welcomeSection}>
+                <Text style={styles.welcomeTitle}>
+                    <Text style={styles.highlight}>NEWNEW</Text>한 <Text style={styles.highlight}>시선</Text>으로{'\n'}
+                    오늘의 뉴스를 만나보세요!
+                </Text>
+                <Text style={styles.welcomeSubtitle}>
+                    "세대별 뉴스 해석 차이를 한눈에!"
+                </Text>
+            </View>
+
+            <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>오늘의 NEW Pick</Text>
+                <View style={styles.dot} />
+            </View>
+
+            <NewsCard
+                category="경제"
+                time="1시간 전"
+                title='비트코인, 1억3000만원도 붕괴...블룸버그 "추가 하락 가능"'
+                imageUrl="https://via.placeholder.com/300x160"
+                badgeText="👁 20대 관심도 높음"
+                categoryColor="#E8F0FE"
+                categoryTextColor="#1A73E8"
+                overlayInfo={{
+                    title: "비트코인 BTC",
+                    price: "129,744,000.00",
+                    change: "▼ -152,000.00 -0.12%"
+                }}
+            />
+
+            <NewsCard
+                category="사회"
+                time="2시간 전"
+                title='쿠팡 동탄 물류센터서 30대 근로자 사망...사측 "지병 있어"'
+                badgeText="⚡ 세대 의견 차이↑"
+                badgeColor="#FFF3E0"
+                badgeTextColor="#FF6D00"
+            />
+
+            <View style={{ height: 20 }} />
+        </ScrollView>
+    );
+
+    const renderNewsContent = () => (
+        <View style={{ flex: 1 }}>
+            {/* Category Bar */}
+            <View style={styles.categoryBar}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryScroll}>
+                    {CATEGORIES.map((cat) => (
+                        <TouchableOpacity
+                            key={cat}
+                            style={[styles.categoryItem, selectedCategory === cat && styles.categoryItemActive]}
+                            onPress={() => setSelectedCategory(cat)}
+                        >
+                            <Text style={[styles.categoryText, selectedCategory === cat && styles.categoryTextActive]}>
+                                {cat}
+                            </Text>
+                        </TouchableOpacity>
+                    ))}
+                </ScrollView>
+            </View>
+
+            <ScrollView contentContainerStyle={styles.scrollContent}>
+                <View style={styles.sectionHeader}>
+                    <Text style={styles.sectionTitle}>오늘의 {selectedCategory} Pick</Text>
+                </View>
+
+                {/* Featured News */}
+                <NewsCard
+                    category={selectedCategory}
+                    time="2시간 전"
+                    title='쿠팡 동탄 물류센터서 30대 근로자 사망...사측 "지병 있어"'
+                    imageUrl="https://via.placeholder.com/300x160"
+                    badgeText="⚡ 세대 의견 차이↑"
+                    badgeColor="#FFF3E0"
+                    badgeTextColor="#FF6D00"
+                />
+
+                <View style={styles.divider} />
+                {/* List News */}
+                <NewsCard
+                    layout="horizontal"
+                    category={selectedCategory}
+                    time="1시간 전"
+                    title={"'구더기 방치' 부사관 아내, 끝내 사망.. 유족 \"가족들 못오게 했다\""}
+                    imageUrl="https://via.placeholder.com/80"
+                    badgeText="🤝 세대 의견 차이↓"
+                    badgeColor="#FFF8E1"
+                    badgeTextColor="#F57C00"
+                />
+
+                <NewsCard
+                    layout="horizontal"
+                    category={selectedCategory}
+                    time="1시간 전"
+                    title='"물티슈 판매 전면 금지" 정부 선포... 내년부터 영국 전역서 시행'
+                    imageUrl="https://via.placeholder.com/80"
+                    badgeText="📌 관심도 높음"
+                    badgeColor="#F3E5F5"
+                    badgeTextColor="#7B1FA2"
+                />
+
+                <View style={{ height: 20 }} />
+            </ScrollView>
+        </View>
+    );
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
@@ -17,81 +130,11 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
                 />
             </View>
 
-            <ScrollView contentContainerStyle={styles.scrollContent}>
-                <View style={styles.welcomeSection}>
-                    <Text style={styles.welcomeTitle}>
-                        <Text style={styles.highlight}>NEWNEW</Text>한 <Text style={styles.highlight}>시선</Text>으로{'\n'}
-                        오늘의 뉴스를 만나보세요!
-                    </Text>
-                    <Text style={styles.welcomeSubtitle}>
-                        "세대별 뉴스 해석 차이를 한눈에!"
-                    </Text>
-                </View>
-
-                <View style={styles.sectionHeader}>
-                    <Text style={styles.sectionTitle}>오늘의 NEW Pick</Text>
-                    <View style={styles.dot} />
-                </View>
-
-                {/* News Card 1 */}
-                <View style={styles.newsCard}>
-                    <View style={styles.cardHeader}>
-                        <View style={styles.tagContainer}>
-                            <View style={[styles.tag, { backgroundColor: '#E8F0FE' }]}>
-                                <Text style={[styles.tagText, { color: '#1A73E8' }]}>경제</Text>
-                            </View>
-                            <Text style={styles.timeText}>1시간 전</Text>
-                        </View>
-                        <View style={[styles.badge, { backgroundColor: '#FFF8E1' }]}>
-                            <Text style={[styles.badgeText, { color: '#F57C00' }]}>👁 20대 관심도 높음</Text>
-                        </View>
-                    </View>
-
-                    <View style={styles.imagePlaceholder}>
-                        {/* Image component would go here */}
-                        <Image
-                            source={{ uri: 'https://via.placeholder.com/300x160' }}
-                            style={styles.newsImage}
-                            resizeMode="cover"
-                        />
-                        {/* Overlay text for demo purposes if image fails loading or just to show structure */}
-                        <View style={styles.imageOverlay}>
-                            <Text style={styles.overlayText}>비트코인 BTC</Text>
-                            <Text style={styles.overlayPrice}>129,744,000.00</Text>
-                            <Text style={styles.overlayChange}>▼ -152,000.00 -0.12%</Text>
-                        </View>
-                    </View>
-
-                    <Text style={styles.newsTitle} numberOfLines={2}>
-                        비트코인, 1억3000만원도 붕괴...블룸버그 "추가 하락 가능"
-                    </Text>
-                </View>
-
-                {/* News Card 2 */}
-                <View style={styles.newsCard}>
-                    <View style={styles.cardHeader}>
-                        <View style={styles.tagContainer}>
-                            <View style={[styles.tag, { backgroundColor: '#E8F0FE' }]}>
-                                <Text style={[styles.tagText, { color: '#1A73E8' }]}>사회</Text>
-                            </View>
-                            <Text style={styles.timeText}>2시간 전</Text>
-                        </View>
-                        <View style={[styles.badge, { backgroundColor: '#FFF3E0' }]}>
-                            <Text style={[styles.badgeText, { color: '#FF6D00' }]}>⚡ 세대 의견 차이↑</Text>
-                        </View>
-                    </View>
-
-                    <View style={[styles.imagePlaceholder, { backgroundColor: '#F5F5F5' }]}>
-                        {/* Empty placeholder as requested */}
-                    </View>
-
-                    <Text style={styles.newsTitle} numberOfLines={2}>
-                        쿠팡 동탄 물류센터서 30대 근로자 사망...사측 "지병 있어"
-                    </Text>
-                </View>
-
-                <View style={{ height: 20 }} />
-            </ScrollView>
+            <View style={styles.contentContainer}>
+                {activeTab === 'home' ? renderHomeContent() :
+                    activeTab === 'news' ? renderNewsContent() :
+                        <View style={styles.centerContent}><Text>준비 중입니다</Text></View>}
+            </View>
 
             {/* Bottom Navigation Bar */}
             <View style={styles.bottomNav}>
@@ -139,9 +182,18 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#F8F9FA',
     },
+    contentContainer: {
+        flex: 1,
+        marginBottom: 80, // Space for bottom nav
+    },
+    centerContent: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     header: {
         paddingHorizontal: 20,
-        paddingTop: 10,
+        paddingTop: 20,
         paddingBottom: 10,
         backgroundColor: '#F8F9FA',
     },
@@ -151,7 +203,7 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         paddingHorizontal: 20,
-        paddingBottom: 80,
+        paddingBottom: 20,
     },
     welcomeSection: {
         marginTop: 20,
@@ -176,6 +228,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 15,
+        marginTop: 10,
     },
     sectionTitle: {
         fontSize: 18,
@@ -189,89 +242,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#2948FF',
         marginLeft: 4,
         marginTop: 4,
-    },
-    newsCard: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 16,
-        padding: 16,
-        marginBottom: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-        elevation: 2,
-    },
-    cardHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 12,
-    },
-    tagContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    tag: {
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 6,
-        marginRight: 8,
-    },
-    tagText: {
-        fontSize: 12,
-        fontWeight: 'bold',
-    },
-    timeText: {
-        fontSize: 12,
-        color: '#888',
-    },
-    badge: {
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 12,
-    },
-    badgeText: {
-        fontSize: 11,
-        fontWeight: 'bold',
-    },
-    imagePlaceholder: {
-        width: '100%',
-        height: 160,
-        backgroundColor: '#333',
-        borderRadius: 12,
-        marginBottom: 12,
-        overflow: 'hidden',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    newsImage: {
-        width: '100%',
-        height: '100%',
-        position: 'absolute',
-    },
-    imageOverlay: {
-        alignItems: 'center',
-    },
-    overlayText: {
-        color: 'white',
-        fontSize: 14,
-        fontWeight: 'bold',
-    },
-    overlayPrice: {
-        color: 'white',
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginVertical: 4,
-    },
-    overlayChange: {
-        color: '#FF5252',
-        fontSize: 14,
-    },
-    newsTitle: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#111',
-        lineHeight: 24,
     },
     bottomNav: {
         flexDirection: 'row',
@@ -311,5 +281,34 @@ const styles = StyleSheet.create({
         width: 24,
         height: 24,
         marginBottom: 4,
+    },
+    // Category Bar Styles
+    categoryBar: {
+        backgroundColor: '#F8F9FA',
+        paddingVertical: 10,
+    },
+    categoryScroll: {
+        paddingHorizontal: 20,
+    },
+    categoryItem: {
+        marginRight: 20,
+        paddingVertical: 8,
+    },
+    categoryItemActive: {
+        borderBottomWidth: 2,
+        borderBottomColor: '#2948FF',
+    },
+    categoryText: {
+        fontSize: 16,
+        color: '#888',
+    },
+    categoryTextActive: {
+        color: '#2948FF',
+        fontWeight: 'bold',
+    },
+    divider: {
+        height: 1,
+        backgroundColor: '#E0E0E0',
+        marginVertical: 20,
     },
 });
