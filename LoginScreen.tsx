@@ -2,16 +2,26 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { authService } from './services/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LoginScreen({ navigation }: { navigation: any }) {
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleLogin = () => {
-        if (id === '123' && password === '123') {
+    const handleLogin = async () => {
+        try {
+            const response = await authService.login({ loginId: id, password: password });
+            console.log('[Login] Response:', response);
+            await AsyncStorage.setItem('accessToken', response.accessToken);
+            if (response.refreshToken) {
+                await AsyncStorage.setItem('refreshToken', response.refreshToken);
+            }
+            console.log('[Login] Tokens saved');
             navigation.replace('Home');
-        } else {
-            alert('아이디 또는 비밀번호를 확인해주세요.\n(테스트 계정: 123 / 123)');
+        } catch (error) {
+            console.error(error);
+            alert('로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.');
         }
     };
 

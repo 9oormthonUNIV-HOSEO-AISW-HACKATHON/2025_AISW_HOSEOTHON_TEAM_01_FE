@@ -1,12 +1,48 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { userService, MyPageResponse } from './services/user';
+import { authService } from './services/auth';
 
 export default function MyPageScreen({ navigation }: { navigation: any }) {
+    const [userInfo, setUserInfo] = useState<MyPageResponse | null>(null);
+
+    useEffect(() => {
+        fetchMyPage();
+    }, []);
+
+    const fetchMyPage = async () => {
+        try {
+            const data = await userService.getMyPage();
+            setUserInfo(data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleLogout = async () => {
+        try {
+            await authService.logout();
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Login' }],
+            });
+        } catch (error) {
+            console.error(error);
+            alert('로그아웃에 실패했습니다.');
+        }
+    };
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                    <Image
+                        source={require('./assets/back.png')}
+                        style={styles.backIcon}
+                        resizeMode="contain"
+                    />
+                </TouchableOpacity>
                 <Image
                     source={require('./assets/splash-icon.png')}
                     style={styles.logo}
@@ -20,14 +56,17 @@ export default function MyPageScreen({ navigation }: { navigation: any }) {
 
                 <View style={styles.profileCard}>
                     <View style={styles.profileImageContainer}>
-                        <View style={styles.profileImage} />
+                        <Image
+                            source={require('./assets/apeach.png')}
+                            style={styles.profileImage}
+                        />
                     </View>
                     <View style={styles.profileInfo}>
                         <View style={styles.generationBadge}>
-                            <Text style={styles.generationBadgeText}>20대</Text>
+                            <Text style={styles.generationBadgeText}>{userInfo?.generation || '세대'}</Text>
                         </View>
-                        <Text style={styles.profileName}>닉네임</Text>
-                        <Text style={styles.profileEmail}>아이디</Text>
+                        <Text style={styles.profileName}>{userInfo?.nickName || '닉네임'}</Text>
+                        <Text style={styles.profileEmail}>{userInfo?.id || '아이디'}</Text>
                     </View>
                 </View>
 
@@ -38,7 +77,7 @@ export default function MyPageScreen({ navigation }: { navigation: any }) {
                     <Text style={styles.menuText}>도움말</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.menuItem}>
+                <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
                     <Text style={styles.menuText}>로그아웃</Text>
                 </TouchableOpacity>
 
@@ -58,10 +97,20 @@ const styles = StyleSheet.create({
         backgroundColor: '#F8F9FA',
     },
     header: {
+        flexDirection: 'row',
+        alignItems: 'center',
         paddingHorizontal: 20,
         paddingTop: 20,
         paddingBottom: 10,
         backgroundColor: '#F8F9FA',
+    },
+    backButton: {
+        marginRight: 10,
+        padding: 5,
+    },
+    backIcon: {
+        width: 24,
+        height: 24,
     },
     logo: {
         width: 150,

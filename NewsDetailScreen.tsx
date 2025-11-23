@@ -1,18 +1,53 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, SafeAreaView, Dimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView as SafeAreaContext } from 'react-native-safe-area-context';
+import { newsService } from './services/news';
 
 const { width } = Dimensions.get('window');
 
 export default function NewsDetailScreen({ route, navigation }: { route: any, navigation: any }) {
-    // Get params from navigation, or use defaults for testing
+    // Get params from navigation
     const {
-        title = '쿠팡 동탄 물류센터서 30대 근로자 사망...사측 "지병 있어"',
+        newsId,
+        title = '뉴스 제목',
         imageUrl = 'https://via.placeholder.com/300x200',
         category = '사회',
-        time = '2시간 전'
+        time = '2시간 전',
+        content: initialContent
     } = route.params || {};
+
+    const [content, setContent] = useState(initialContent || '');
+    const [reportBlur, setReportBlur] = useState(false);
+    const [hasParticipated, setHasParticipated] = useState(false);
+
+    useEffect(() => {
+        if (newsId) {
+            if (!initialContent) {
+                fetchDetail();
+            }
+            checkParticipation();
+        }
+    }, [newsId]);
+
+    const fetchDetail = async () => {
+        try {
+            const response = await newsService.getNewsDetail(newsId);
+            setContent(response.content || '');
+            setReportBlur(response.reportBlur);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const checkParticipation = async () => {
+        try {
+            const participated = await newsService.checkSurveyParticipation(newsId);
+            setHasParticipated(participated);
+        } catch (error) {
+            console.error('Error checking survey participation:', error);
+        }
+    };
 
     return (
         <SafeAreaContext style={styles.container}>
@@ -34,15 +69,7 @@ export default function NewsDetailScreen({ route, navigation }: { route: any, na
 
                 <View style={styles.contentCard}>
                     <Text style={styles.contentText}>
-                        경기 화성시 쿠팡 물류센터에서 30대 남성 근로자가 숨져 경찰이 관련 경위를 조사하고 있다.
-                        {'\n\n'}
-                        22일 화성동탄경찰서 등에 따르면 전날 오후 10시 30분께 화성시 신동에 위치한 쿠팡 동탄1센터 내 식당에서 A씨가 갑자기 쓰러졌다. A씨는 심정지 상태로 인근 병원에 이송됐으나 숨졌다.
-                        {'\n\n'}
-                        계약직 근로자였던 A씨는 단순 포장 관련 업무를 맡고 있었던 것으로 전해졌다.
-                        {'\n\n'}
-                        경찰은 A씨의 시신에 대해 부검을 진행하며 사인을 밝힐 방침이다.
-                        {'\n\n'}
-                        쿠팡풀필먼트서비스 관계자는 "삼가 고인의 명복을 빌며 유족께 깊은 위로를 전한다"며 "고인은 지병이 있었던 것으로 확인된다"고 말했다. 이어 "최근 3개월간 고인의 주당 평균 근무일수는 4.3일, 주당 평균 근무시간은 40시간 미만이었다"며 "회사는 유족 지원에 최선을 다할 것"이라고 했다.
+                        {content || '본문 내용을 불러오는 중입니다...'}
                     </Text>
                 </View>
 
@@ -52,12 +79,25 @@ export default function NewsDetailScreen({ route, navigation }: { route: any, na
                         style={styles.footerBackground}
                     />
                     <View style={styles.footerOverlay}>
-                        <TouchableOpacity
-                            style={styles.actionButton}
-                            onPress={() => navigation.navigate('Survey')}
-                        >
-                            <Text style={styles.actionButtonText}>세대별 관점 분석을 보려면, 의견을 남겨주세요!</Text>
-                        </TouchableOpacity>
+                        {reportBlur ? (
+                            <View style={styles.blurMessage}>
+                                <Text style={styles.blurMessageText}>설문을 먼저 완료해주세요!</Text>
+                            </View>
+                        ) : hasParticipated ? (
+                            <TouchableOpacity
+                                style={styles.participatedButton}
+                                onPress={() => navigation.navigate('SurveyResult', { newsId, title })}
+                            >
+                                <Text style={styles.participatedButtonText}>✅ 이미 참여한 설문입니다 - 결과 보기</Text>
+                            </TouchableOpacity>
+                        ) : (
+                            <TouchableOpacity
+                                style={styles.actionButton}
+                                onPress={() => navigation.navigate('Survey', { newsId })}
+                            >
+                                <Text style={styles.actionButtonText}>세대별 관점 분석을 보려면, 의견을 남겨주세요!</Text>
+                            </TouchableOpacity>
+                        )}
                     </View>
                 </View>
 
@@ -167,6 +207,47 @@ const styles = StyleSheet.create({
     },
     actionButtonText: {
         color: '#FFFFFF',
+        fontSize: 13,
+        fontWeight: 'bold',
+    },
+    blurMessage: {
+        backgroundColor: '#F0F0F0',
+        paddingVertical: 14,
+        paddingHorizontal: 16,
+        borderRadius: 12,
+        width: '100%',
+        alignItems: 'center',
+    },
+    blurMessageText: {
+        color: '#888',
+        fontSize: 13,
+        fontWeight: 'bold',
+    },
+    participatedMessage: {
+        backgroundColor: '#E8F5E9',
+        paddingVertical: 14,
+        paddingHorizontal: 16,
+        borderRadius: 12,
+        width: '100%',
+        alignItems: 'center',
+    },
+    participatedMessageText: {
+        color: '#2E7D32',
+        fontSize: 13,
+        fontWeight: 'bold',
+    },
+    participatedButton: {
+        backgroundColor: '#E8F5E9',
+        paddingVertical: 14,
+        paddingHorizontal: 16,
+        borderRadius: 12,
+        width: '100%',
+        alignItems: 'center',
+        borderWidth: 2,
+        borderColor: '#2E7D32',
+    },
+    participatedButtonText: {
+        color: '#2E7D32',
         fontSize: 13,
         fontWeight: 'bold',
     },

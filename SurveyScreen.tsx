@@ -1,35 +1,68 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { newsService, SurveyQuestion } from './services/news';
 
 export default function SurveyScreen({ route, navigation }: { route: any, navigation: any }) {
-    const [currentQuestion, setCurrentQuestion] = useState(1);
-    const [answer, setAnswer] = useState('');
-    const totalQuestions = 5;
+    const { newsId, title } = route.params || {};
+    const [questions, setQuestions] = useState<SurveyQuestion[]>([]);
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    const [answers, setAnswers] = useState<string[]>([]);
+    const [currentAnswer, setCurrentAnswer] = useState('');
     const maxChars = 200;
 
-    const questions = [
-        "이 뉴스를 한 문장으로 요약하면 어떻게 생각하나요?",
-        "이 뉴스에서 가장 중요한 부분은 무엇이라고 생각하나요?",
-        "이 뉴스가 사회에 미치는 영향은 무엇일까요?",
-        "이 뉴스에 대한 당신의 의견은 무엇인가요?",
-        "이 뉴스와 관련하여 더 알고 싶은 것이 있나요?"
-    ];
+    useEffect(() => {
+        fetchQuestions();
+    }, []);
 
-    const handleNext = () => {
-        if (currentQuestion < totalQuestions) {
-            setCurrentQuestion(currentQuestion + 1);
-            setAnswer('');
-        } else {
-            // Navigate to results screen
-            navigation.navigate('SurveyResult', {
-                title: route.params?.title || '쿠팡 동탄 물류센터서 30대 근로자 사망...사측 "지병 있어"'
-            });
+    const fetchQuestions = async () => {
+        try {
+            const data = await newsService.getSurveyQuestions();
+            setQuestions(data);
+            // Initialize answers array
+            setAnswers(new Array(data.length).fill(''));
+        } catch (error) {
+            console.error(error);
+            alert('설문 질문을 불러오는데 실패했습니다.');
         }
     };
 
-    const progress = (currentQuestion / totalQuestions) * 100;
+    const handleNext = async () => {
+        if (!currentAnswer.trim()) {
+            alert('답변을 입력해주세요.');
+            return;
+        }
+
+        const newAnswers = [...answers];
+        newAnswers[currentQuestionIndex] = currentAnswer;
+        setAnswers(newAnswers);
+
+        if (currentQuestionIndex < questions.length - 1) {
+            setCurrentQuestionIndex(currentQuestionIndex + 1);
+            setCurrentAnswer('');
+        } else {
+            // Submit
+            try {
+                await newsService.submitSurveyAnswers({
+                    newsId: String(newsId),
+                    q1Answer: newAnswers[0],
+                    q2Answer: newAnswers[1],
+                    q3Answer: newAnswers[2],
+                    q4Answer: newAnswers[3],
+                    q5Answer: currentAnswer
+                });
+                navigation.replace('SurveyResult', { newsId, title });
+            } catch (error) {
+                console.error(error);
+                alert('답변 제출에 실패했습니다.');
+            }
+        }
+    };
+
+    const progress = questions.length > 0 ? ((currentQuestionIndex + 1) / questions.length) * 100 : 0;
+    const currentQuestionNum = questions.length > 0 ? questions[currentQuestionIndex].surveyNum : 1;
+    const currentQuestionText = questions.length > 0 ? questions[currentQuestionIndex].surveyQuestion : '질문을 불러오는 중입니다...';
 
     return (
         <SafeAreaView style={styles.container}>
@@ -60,9 +93,9 @@ export default function SurveyScreen({ route, navigation }: { route: any, naviga
                     {/* Question Container */}
                     <View style={styles.questionContainer}>
                         <View style={styles.questionBadge}>
-                            <Text style={styles.questionBadgeText}>Q{currentQuestion}</Text>
+                            <Text style={styles.questionBadgeText}>Q{currentQuestionNum}</Text>
                         </View>
-                        <Text style={styles.questionText}>{questions[currentQuestion - 1]}</Text>
+                        <Text style={styles.questionText}>{currentQuestionText}</Text>
                     </View>
 
                     {/* Answer Input */}
@@ -72,12 +105,12 @@ export default function SurveyScreen({ route, navigation }: { route: any, naviga
                             placeholder="답변을 작성해주세요."
                             placeholderTextColor="#C4C4C4"
                             multiline
-                            value={answer}
-                            onChangeText={setAnswer}
+                            value={currentAnswer}
+                            onChangeText={setCurrentAnswer}
                             maxLength={maxChars}
                             textAlignVertical="top"
                         />
-                        <Text style={styles.charCounter}>{answer.length}/{maxChars} 자</Text>
+                        <Text style={styles.charCounter}>{currentAnswer.length}/{maxChars} 자</Text>
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>

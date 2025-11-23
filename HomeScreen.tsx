@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import NewsCard from './components/NewsCard';
 import ReportScreen from './ReportScreen';
+import { newsService, NewsItem } from './services/news';
 
 const { width } = Dimensions.get('window');
 
@@ -11,7 +12,36 @@ const CATEGORIES = ['전체', '정치', '경제', '사회', '생활', 'IT'];
 
 export default function HomeScreen({ navigation }: { navigation: any }) {
     const [activeTab, setActiveTab] = useState('home');
-    const [selectedCategory, setSelectedCategory] = useState('사회');
+    const [selectedCategory, setSelectedCategory] = useState('전체');
+    const [newsList, setNewsList] = useState<NewsItem[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchNews();
+    }, []);
+
+    const fetchNews = async () => {
+        try {
+            const response = await newsService.getNewsList();
+            console.log('[HomeScreen] Total news count:', response.newsList.length);
+            console.log('response', response);
+
+            // Log thumbnail URLs
+            response.newsList.forEach((news, index) => {
+                console.log(`[HomeScreen] News ${index + 1} thumbnail:`, news.thumbnailUrl || 'NO URL');
+            });
+
+            setNewsList(response.newsList);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const filteredNews = selectedCategory === '전체'
+        ? newsList
+        : newsList.filter(news => news.category === selectedCategory);
 
     const renderHomeContent = () => (
         <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -30,41 +60,22 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
                 <View style={styles.dot} />
             </View>
 
-            <NewsCard
-                category="경제"
-                time="1시간 전"
-                title='비트코인, 1억3000만원도 붕괴...블룸버그 "추가 하락 가능"'
-                imageUrl="https://via.placeholder.com/300x160"
-                badgeText="👁 20대 관심도 높음"
-                categoryColor="#E8F0FE"
-                categoryTextColor="#1A73E8"
-                overlayInfo={{
-                    title: "비트코인 BTC",
-                    price: "129,744,000.00",
-                    change: "▼ -152,000.00 -0.12%"
-                }}
-                onPress={() => navigation.navigate('NewsDetail', {
-                    title: '비트코인, 1억3000만원도 붕괴...블룸버그 "추가 하락 가능"',
-                    imageUrl: 'https://via.placeholder.com/300x160',
-                    category: '경제',
-                    time: '1시간 전'
-                })}
-            />
-
-            <NewsCard
-                category="사회"
-                time="2시간 전"
-                title='쿠팡 동탄 물류센터서 30대 근로자 사망...사측 "지병 있어"'
-                badgeText="⚡ 세대 의견 차이↑"
-                badgeColor="#FFF3E0"
-                badgeTextColor="#FF6D00"
-                onPress={() => navigation.navigate('NewsDetail', {
-                    title: '쿠팡 동탄 물류센터서 30대 근로자 사망...사측 "지병 있어"',
-                    imageUrl: 'https://via.placeholder.com/300x160', // Assuming image exists or placeholder
-                    category: '사회',
-                    time: '2시간 전'
-                })}
-            />
+            {newsList.map((news) => (
+                <NewsCard
+                    key={news.newsId}
+                    category={news.category}
+                    time={news.latestTime}
+                    title={news.title}
+                    imageUrl={news.thumbnailUrl}
+                    onPress={() => navigation.navigate('NewsDetail', {
+                        newsId: news.newsId,
+                        title: news.title,
+                        imageUrl: news.thumbnailUrl,
+                        category: news.category,
+                        time: news.latestTime
+                    })}
+                />
+            ))}
 
             <View style={{ height: 20 }} />
         </ScrollView>
@@ -95,57 +106,41 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
                 </View>
 
                 {/* Featured News */}
-                <NewsCard
-                    category={selectedCategory}
-                    time="2시간 전"
-                    title='쿠팡 동탄 물류센터서 30대 근로자 사망...사측 "지병 있어"'
-                    imageUrl="https://via.placeholder.com/300x160"
-                    badgeText="⚡ 세대 의견 차이↑"
-                    badgeColor="#FFF3E0"
-                    badgeTextColor="#FF6D00"
-                    onPress={() => navigation.navigate('NewsDetail', {
-                        title: '쿠팡 동탄 물류센터서 30대 근로자 사망...사측 "지병 있어"',
-                        imageUrl: 'https://via.placeholder.com/300x160',
-                        category: selectedCategory,
-                        time: '2시간 전'
-                    })}
-                />
+                {filteredNews.length > 0 && (
+                    <NewsCard
+                        category={filteredNews[0].category}
+                        time={filteredNews[0].latestTime}
+                        title={filteredNews[0].title}
+                        imageUrl={filteredNews[0].thumbnailUrl}
+                        onPress={() => navigation.navigate('NewsDetail', {
+                            newsId: filteredNews[0].newsId,
+                            title: filteredNews[0].title,
+                            imageUrl: filteredNews[0].thumbnailUrl,
+                            category: filteredNews[0].category,
+                            time: filteredNews[0].latestTime
+                        })}
+                    />
+                )}
 
                 <View style={styles.divider} />
                 {/* List News */}
-                <NewsCard
-                    layout="horizontal"
-                    category={selectedCategory}
-                    time="1시간 전"
-                    title={"'구더기 방치' 부사관 아내, 끝내 사망.. 유족 \"가족들 못오게 했다\""}
-                    imageUrl="https://via.placeholder.com/80"
-                    badgeText="🤝 세대 의견 차이↓"
-                    badgeColor="#FFF8E1"
-                    badgeTextColor="#F57C00"
-                    onPress={() => navigation.navigate('NewsDetail', {
-                        title: "'구더기 방치' 부사관 아내, 끝내 사망.. 유족 \"가족들 못오게 했다\"",
-                        imageUrl: 'https://via.placeholder.com/80',
-                        category: selectedCategory,
-                        time: '1시간 전'
-                    })}
-                />
-
-                <NewsCard
-                    layout="horizontal"
-                    category={selectedCategory}
-                    time="1시간 전"
-                    title='"물티슈 판매 전면 금지" 정부 선포... 내년부터 영국 전역서 시행'
-                    imageUrl="https://via.placeholder.com/80"
-                    badgeText="📌 관심도 높음"
-                    badgeColor="#F3E5F5"
-                    badgeTextColor="#7B1FA2"
-                    onPress={() => navigation.navigate('NewsDetail', {
-                        title: '"물티슈 판매 전면 금지" 정부 선포... 내년부터 영국 전역서 시행',
-                        imageUrl: 'https://via.placeholder.com/80',
-                        category: selectedCategory,
-                        time: '1시간 전'
-                    })}
-                />
+                {filteredNews.slice(1).map((news) => (
+                    <NewsCard
+                        key={news.newsId}
+                        layout="horizontal"
+                        category={news.category}
+                        time={news.latestTime}
+                        title={news.title}
+                        imageUrl={news.thumbnailUrl}
+                        onPress={() => navigation.navigate('NewsDetail', {
+                            newsId: news.newsId,
+                            title: news.title,
+                            imageUrl: news.thumbnailUrl,
+                            category: news.category,
+                            time: news.latestTime
+                        })}
+                    />
+                ))}
 
                 <View style={{ height: 20 }} />
             </ScrollView>

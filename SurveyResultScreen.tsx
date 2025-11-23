@@ -1,115 +1,74 @@
-import React, { useState, useRef } from 'react';
-import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Dimensions, FlatList } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-
-const { width } = Dimensions.get('window');
-const CARD_WIDTH = width * 0.8;
-const SPACING = 10;
+import { newsService, SurveyStatisticsResponse } from './services/news';
 
 export default function SurveyResultScreen({ route, navigation }: { route: any, navigation: any }) {
-    const { title = '쿠팡 동탄 물류센터서 30대 근로자 사망...사측 "지병 있어"' } = route.params || {};
-    const [activeIndex, setActiveIndex] = useState(1); // Start with 30s (index 1)
+    const { newsId, title } = route.params || {};
+    const [resultData, setResultData] = useState<SurveyStatisticsResponse | null>(null);
+    const [loading, setLoading] = useState(true);
 
-    const generationData = [
-        {
-            id: '20s',
-            label: '20대',
-            badgeColor: '#E8F0FE',
-            textColor: '#2948FF',
-            opinions: [
-                '안전한 근무 환경이 최우선되어야 한다',
-                '기업의 책임감 있는 태도가 필요하다',
-                '정확한 진상 규명이 이루어져야 한다'
-            ],
-            hashtags: ['#안전제일', '#기업책임', '#진상규명']
-        },
-        {
-            id: '30s',
-            label: '30대',
-            badgeColor: '#FFE8D6',
-            textColor: '#FF8A3D',
-            opinions: [
-                '개인의 건강 문제와 과로 여부\n모두 조사해야 한다',
-                '개인의 건강 문제와 과로 여부\n모두 조사해야 한다',
-                '개인의 건강 문제와 과로 여부\n모두 조사해야 한다'
-            ],
-            hashtags: ['#심리적스트레스', '#근무환경피로', '#정확한조사필요']
-        },
-        {
-            id: '40s',
-            label: '40대',
-            badgeColor: '#E6F7E9',
-            textColor: '#00C851',
-            opinions: [
-                '제도적인 보완 장치가 시급하다',
-                '노동자의 권익 보호가 강화되어야 한다',
-                '재발 방지를 위한 대책이 필요하다'
-            ],
-            hashtags: ['#제도개선', '#권익보호', '#재발방지']
-        },
-        {
-            id: '50s',
-            label: '50대',
-            badgeColor: '#F3E5F5',
-            textColor: '#9C27B0',
-            opinions: [
-                '사회적 합의를 통한 해결이 필요하다',
-                '서로 배려하는 노사 문화가 정착되어야 한다',
-                '지속적인 관심과 감시가 필요하다'
-            ],
-            hashtags: ['#사회적합의', '#상생문화', '#지속적관심']
-        },
-        {
-            id: '60s',
-            label: '60대',
-            badgeColor: '#FFF3E0',
-            textColor: '#FF9800',
-            opinions: [
-                '건강 관리에 대한 개인의 책임도 중요하다',
-                '기업과 근로자가 함께 노력해야 한다',
-                '안타까운 사고에 깊은 애도를 표한다'
-            ],
-            hashtags: ['#건강관리', '#노사협력', '#애도']
+    useEffect(() => {
+        if (newsId) {
+            fetchResult();
         }
-    ];
+    }, [newsId]);
 
-    const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: any[] }) => {
-        if (viewableItems.length > 0) {
-            setActiveIndex(viewableItems[0].index);
+    useEffect(() => {
+        // Check if we have valid generation data (commonAspect can be null as per service policy)
+        const hasValidGenerationData = resultData?.generationAspectList && resultData.generationAspectList.length > 0;
+
+        // Only poll if we don't have generation data
+        const needsPolling = !hasValidGenerationData;
+
+        if (needsPolling && newsId) {
+            console.log('[SurveyResult] Polling... Has generation:', hasValidGenerationData);
+            const interval = setInterval(() => {
+                fetchResult();
+            }, 1000); // Poll every 1 second
+
+            return () => clearInterval(interval);
+        } else if (!needsPolling) {
+            console.log('[SurveyResult] Generation data complete, stopping poll');
         }
-    }).current;
+    }, [resultData, newsId]);
 
-    const viewabilityConfig = useRef({
-        itemVisiblePercentThreshold: 50
-    }).current;
+    const fetchResult = async () => {
+        try {
+            const data = await newsService.getSurveyStatistics(newsId);
+            setResultData(data);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    const renderItem = ({ item }: { item: any }) => (
-        <View style={[styles.cardContainer, { width: CARD_WIDTH }]}>
-            {/* Generation Badge */}
-            <View style={[styles.generationBadge, { backgroundColor: item.badgeColor }]}>
-                <Text style={[styles.generationBadgeText, { color: item.textColor }]}>{item.label}</Text>
-            </View>
+    const getGenerationLabel = (gen: string) => {
+        const labels: { [key: string]: string } = {
+            'GEN_Z': 'Z세대',
+            'MILLENNIAL': '밀레니얼',
+            'GEN_X': 'X세대',
+            'BABY_BOOMER': '베이비부머',
+        };
+        return labels[gen] || gen;
+    };
 
-            {/* Opinion Cards */}
-            {item.opinions.map((opinion: string, index: number) => (
-                <View key={index} style={styles.opinionCard}>
-                    <Text style={styles.fireIcon}>🔥</Text>
-                    <Text style={styles.opinionText}>{opinion}</Text>
-                </View>
-            ))}
+    const getGenerationColor = (index: number) => {
+        const colors = [
+            { bg: '#E8F0FE', text: '#2948FF' },
+            { bg: '#FFE8D6', text: '#FF8A3D' },
+            { bg: '#E6F7E9', text: '#00C851' },
+            { bg: '#F3E5F5', text: '#9C27B0' },
+        ];
+        return colors[index % colors.length];
+    };
 
-            {/* Hashtags */}
-            <View style={styles.hashtagContainer}>
-                {item.hashtags.map((tag: string, index: number) => (
-                    <View key={index} style={styles.hashtag}>
-                        <Text style={styles.hashtagText}>{tag}</Text>
-                    </View>
-                ))}
-            </View>
-        </View>
-    );
+    // Check if data is empty
+    const hasCommonAspect = resultData?.commonAspect && resultData.commonAspect.trim().length > 0;
+    const hasGenerationData = resultData?.generationAspectList && resultData.generationAspectList.length > 0;
 
     return (
         <SafeAreaView style={styles.container}>
@@ -123,48 +82,74 @@ export default function SurveyResultScreen({ route, navigation }: { route: any, 
 
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 {/* News Title */}
-                <Text style={styles.newsTitle}>{title}</Text>
+                <Text style={styles.newsTitle}>{title || '뉴스 제목'}</Text>
 
-                {/* Top 3 Section */}
-                <Text style={styles.sectionTitle}>세대별 관점 TOP3</Text>
-
-                {/* Carousel */}
-                <View style={{ height: 450 }}>
-                    <FlatList
-                        data={generationData}
-                        renderItem={renderItem}
-                        keyExtractor={(item) => item.id}
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        snapToInterval={CARD_WIDTH + SPACING * 2}
-                        decelerationRate="fast"
-                        contentContainerStyle={{
-                            paddingHorizontal: (width - CARD_WIDTH) / 2 - SPACING,
-                        }}
-                        ItemSeparatorComponent={() => <View style={{ width: SPACING * 2 }} />}
-                        onViewableItemsChanged={onViewableItemsChanged}
-                        viewabilityConfig={viewabilityConfig}
-                        initialScrollIndex={1}
-                        getItemLayout={(data, index) => ({
-                            length: CARD_WIDTH + SPACING * 2,
-                            offset: (CARD_WIDTH + SPACING * 2) * index,
-                            index,
-                        })}
-                    />
+                {/* Common Aspect Section */}
+                <View style={styles.commonSection}>
+                    <View style={styles.commonHeader}>
+                        <Text style={styles.trophyIcon}>🏆</Text>
+                        <Text style={styles.commonTitle}>세대 공통 관점</Text>
+                    </View>
+                    <View style={styles.commonCard}>
+                        {hasCommonAspect ? (
+                            <>
+                                <Text style={styles.commonAspect}>{resultData.commonAspect}</Text>
+                                <Text style={styles.commonReason}>{resultData.aspectReason || ''}</Text>
+                            </>
+                        ) : (
+                            <View style={styles.emptyState}>
+                                <Text style={styles.emptyStateIcon}>⏳</Text>
+                                <Text style={styles.emptyStateText}>데이터 분석 중입니다...</Text>
+                                <Text style={styles.emptyStateSubtext}>잠시만 기다려주세요</Text>
+                            </View>
+                        )}
+                    </View>
                 </View>
 
-                {/* Pagination Dots */}
-                <View style={styles.paginationContainer}>
-                    {generationData.map((_, index) => (
-                        <View
-                            key={index}
-                            style={[
-                                styles.dot,
-                                index === activeIndex && styles.activeDot
-                            ]}
-                        />
-                    ))}
-                </View>
+                {/* Generation Aspects Section */}
+                <Text style={styles.sectionTitle}>세대별 관점</Text>
+
+                {hasGenerationData ? (
+                    resultData.generationAspectList.map((genAspect, index) => {
+                        const colors = getGenerationColor(index);
+                        return (
+                            <View key={genAspect.generation} style={styles.generationCard}>
+                                <View style={[styles.generationBadge, { backgroundColor: colors.bg }]}>
+                                    <Text style={[styles.generationBadgeText, { color: colors.text }]}>
+                                        {getGenerationLabel(genAspect.generation)}
+                                    </Text>
+                                </View>
+
+                                {/* First Aspect */}
+                                <View style={styles.aspectItem}>
+                                    <Text style={styles.aspectRank}>1순위</Text>
+                                    <Text style={styles.aspectTitle}>{genAspect.firstAspect}</Text>
+                                    <Text style={styles.aspectReason}>{genAspect.firstAspectReason}</Text>
+                                </View>
+
+                                {/* Second Aspect */}
+                                <View style={styles.aspectItem}>
+                                    <Text style={styles.aspectRank}>2순위</Text>
+                                    <Text style={styles.aspectTitle}>{genAspect.secondAspect}</Text>
+                                    <Text style={styles.aspectReason}>{genAspect.secondAspectReason}</Text>
+                                </View>
+
+                                {/* Third Aspect */}
+                                <View style={styles.aspectItem}>
+                                    <Text style={styles.aspectRank}>3순위</Text>
+                                    <Text style={styles.aspectTitle}>{genAspect.thirdAspect}</Text>
+                                    <Text style={styles.aspectReason}>{genAspect.thirdAspectReason}</Text>
+                                </View>
+                            </View>
+                        );
+                    })
+                ) : (
+                    <View style={styles.emptyCard}>
+                        <Text style={styles.emptyStateIcon}>⏳</Text>
+                        <Text style={styles.emptyStateText}>데이터 분석 중입니다...</Text>
+                        <Text style={styles.emptyStateSubtext}>잠시만 기다려주세요</Text>
+                    </View>
+                )}
 
                 {/* Gradient Background */}
                 <LinearGradient
@@ -172,19 +157,6 @@ export default function SurveyResultScreen({ route, navigation }: { route: any, 
                     style={styles.gradient}
                     pointerEvents="none"
                 />
-
-                {/* Overall Perspectives Section */}
-                <View style={styles.overallHeader}>
-                    <Text style={styles.trophyIcon}>🏆</Text>
-                    <Text style={styles.overallTitle}>세대 공통 관점</Text>
-                </View>
-
-                {/* Opinion Items */}
-                <View style={styles.commonOpinionContainer}>
-                    <Text style={[styles.commonOpinionText, { textAlign: 'right' }]}>모두 "정확한 조사 필요"에 동의</Text>
-                    <Text style={[styles.commonOpinionText, { textAlign: 'left' }]}>노동 환경 개선 필요성 공감</Text>
-                    <Text style={[styles.commonOpinionText, { textAlign: 'right' }]}>사측 설명만으로 판단 불가</Text>
-                </View>
 
                 {/* Return to Main Button */}
                 <TouchableOpacity
@@ -214,13 +186,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#F8F9FA',
         alignItems: 'center',
     },
-    backButton: {
-        padding: 5,
-    },
-    backIcon: {
-        width: 24,
-        height: 24,
-    },
     logo: {
         width: 120,
         height: 40,
@@ -238,126 +203,100 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     sectionTitle: {
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: 'bold',
         color: '#111',
         textAlign: 'center',
         marginBottom: 20,
+        marginTop: 20,
     },
-    cardContainer: {
+    commonSection: {
+        paddingHorizontal: 20,
+        marginBottom: 20,
+    },
+    commonHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 15,
+    },
+    trophyIcon: {
+        fontSize: 20,
+        marginRight: 8,
+    },
+    commonTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#111',
+    },
+    commonCard: {
         backgroundColor: '#FFFFFF',
-        borderRadius: 20,
+        borderRadius: 16,
         padding: 20,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 8,
         elevation: 3,
-        alignItems: 'center',
+    },
+    commonAspect: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#111',
+        marginBottom: 10,
+        lineHeight: 24,
+    },
+    commonReason: {
+        fontSize: 14,
+        color: '#666',
+        lineHeight: 22,
+    },
+    generationCard: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 20,
+        padding: 20,
+        marginHorizontal: 20,
+        marginBottom: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 8,
+        elevation: 3,
     },
     generationBadge: {
         paddingHorizontal: 16,
         paddingVertical: 6,
         borderRadius: 8,
-        marginBottom: 20,
+        alignSelf: 'flex-start',
+        marginBottom: 16,
     },
     generationBadgeText: {
         fontSize: 14,
         fontWeight: 'bold',
     },
-    opinionCard: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 16,
-        padding: 16,
-        marginBottom: 12,
-        flexDirection: 'row',
-        alignItems: 'center',
-        width: '100%',
-        borderWidth: 1,
-        borderColor: '#EEEEEE',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 2,
-        elevation: 1,
+    aspectItem: {
+        marginBottom: 16,
+        paddingBottom: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: '#F0F0F0',
     },
-    fireIcon: {
-        fontSize: 18,
-        marginRight: 12,
-    },
-    opinionText: {
-        fontSize: 14,
-        color: '#333',
-        lineHeight: 20,
-        flex: 1,
-        fontWeight: '500',
-        textAlign: 'center',
-    },
-    hashtagContainer: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        marginTop: 10,
-        justifyContent: 'center',
-        gap: 8,
-    },
-    hashtag: {
-        backgroundColor: '#E8F0FE',
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 8,
-    },
-    hashtagText: {
+    aspectRank: {
+        fontSize: 12,
         color: '#2948FF',
-        fontSize: 13,
-        fontWeight: '600',
+        fontWeight: 'bold',
+        marginBottom: 6,
     },
-    paginationContainer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 20,
-        marginBottom: 40,
-        gap: 8,
-    },
-    dot: {
-        width: 6,
-        height: 6,
-        borderRadius: 3,
-        backgroundColor: '#2948FF',
-        opacity: 0.2,
-    },
-    activeDot: {
-        width: 24,
-        height: 6,
-        borderRadius: 3,
-        backgroundColor: '#2948FF',
-        opacity: 1,
-    },
-    overallHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: 20,
-    },
-    trophyIcon: {
-        fontSize: 20,
-        marginRight: 8,
-    },
-    overallTitle: {
-        fontSize: 18,
+    aspectTitle: {
+        fontSize: 15,
         fontWeight: 'bold',
         color: '#111',
+        marginBottom: 6,
+        lineHeight: 22,
     },
-    commonOpinionContainer: {
-        paddingHorizontal: 40,
-        width: '100%',
-    },
-    commonOpinionText: {
-        fontSize: 16,
-        color: '#333',
-        fontWeight: '500',
-        marginBottom: 24,
-        width: '100%',
+    aspectReason: {
+        fontSize: 13,
+        color: '#666',
+        lineHeight: 20,
     },
     gradient: {
         position: 'absolute',
@@ -384,5 +323,38 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    emptyState: {
+        alignItems: 'center',
+        paddingVertical: 30,
+    },
+    emptyCard: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 20,
+        padding: 40,
+        marginHorizontal: 20,
+        marginBottom: 16,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 8,
+        elevation: 3,
+    },
+    emptyStateIcon: {
+        fontSize: 48,
+        marginBottom: 16,
+    },
+    emptyStateText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 8,
+        textAlign: 'center',
+    },
+    emptyStateSubtext: {
+        fontSize: 14,
+        color: '#888',
+        textAlign: 'center',
     },
 });

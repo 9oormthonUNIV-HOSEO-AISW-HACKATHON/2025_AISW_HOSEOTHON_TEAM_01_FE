@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+import { userService, ReportResponse } from './services/user';
 
 const { width } = Dimensions.get('window');
 
@@ -43,16 +44,52 @@ const ReportNewsItem = ({ category, time, title, imageUrl, badgeText, badgeColor
 
 export default function ReportScreen({ navigation }: { navigation: any }) {
     const [selectedCategory, setSelectedCategory] = useState('전체');
+    const [reportData, setReportData] = useState<ReportResponse | null>(null);
+
+    useEffect(() => {
+        fetchReport();
+    }, []);
+
+    const fetchReport = async () => {
+        try {
+            const data = await userService.getReport();
+            setReportData(data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const participation = reportData ? reportData.participation : 0;
+    const mostCategoryCode = reportData ? reportData.mostCategory : '';
+    const newsList = reportData ? reportData.newsList : [];
+
+    // Map category code to Korean name
+    const getCategoryName = (code: string) => {
+        const categoryMap: { [key: string]: string } = {
+            'POLITICS': '정치',
+            'ECONOMY': '경제',
+            'SOCIETY': '사회',
+            'LIFE': '생활',
+            'IT': 'IT',
+        };
+        return categoryMap[code] || code;
+    };
+
+    const mostCategory = getCategoryName(mostCategoryCode);
+
+    const filteredNews = selectedCategory === '전체'
+        ? newsList
+        : newsList.filter(news => news.category === selectedCategory);
 
     return (
         <SafeAreaView style={styles.container}>
             {/* Summary Section - Fixed */}
             <View style={styles.summarySection}>
                 <Text style={styles.summaryText}>
-                    총 <Text style={styles.highlightText}>7개</Text>의 뉴스에 참여했어요
+                    총 <Text style={styles.highlightText}>{participation}개</Text>의 뉴스에 참여했어요
                 </Text>
                 <Text style={styles.summaryText}>
-                    가장 많이 참여한 분야는 '<Text style={styles.highlightText}>사회</Text>'예요
+                    가장 많이 참여한 분야는 '<Text style={styles.highlightText}>{mostCategory}</Text>'예요
                 </Text>
                 <View style={styles.divider} />
             </View>
@@ -78,51 +115,26 @@ export default function ReportScreen({ navigation }: { navigation: any }) {
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 {/* News List */}
                 <View style={styles.newsList}>
-                    <ReportNewsItem
-                        category="사회"
-                        time="1시간 전"
-                        title="'구더기 방치' 부사관 아내, 끝내 사망.. 유족 &quot;가족들 못오게 했다&quot;"
-                        imageUrl="https://via.placeholder.com/80"
-                        badgeText="🤝 세대 의견 차이↓"
-                        badgeColor="#FFF8E1"
-                        badgeTextColor="#F57C00"
-                        onPress={() => navigation.navigate('ArticleWithSurvey', {
-                            title: "'구더기 방치' 부사관 아내, 끝내 사망.. 유족 \"가족들 못오게 했다\"",
-                            imageUrl: 'https://via.placeholder.com/300x160',
-                            category: '사회',
-                            time: '1시간 전'
-                        })}
-                    />
-                    <ReportNewsItem
-                        category="사회"
-                        time="1시간 전"
-                        title='"물티슈 판매 전면 금지" 정부 선포... 내년부터 영국 전역서 시행'
-                        imageUrl="https://via.placeholder.com/80"
-                        badgeText="📌 관심도 높음"
-                        badgeColor="#F3E5F5"
-                        badgeTextColor="#7B1FA2"
-                        onPress={() => navigation.navigate('ArticleWithSurvey', {
-                            title: '"물티슈 판매 전면 금지" 정부 선포... 내년부터 영국 전역서 시행',
-                            imageUrl: 'https://via.placeholder.com/300x160',
-                            category: '사회',
-                            time: '1시간 전'
-                        })}
-                    />
-                    <ReportNewsItem
-                        category="사회"
-                        time="1시간 전"
-                        title='쿠팡 동탄 물류센터서 30대 근로자 사망...사측 "지병 있어"'
-                        imageUrl="https://via.placeholder.com/80"
-                        badgeText="⚡ 세대 의견 차이↑"
-                        badgeColor="#FFF3E0"
-                        badgeTextColor="#FF6D00"
-                        onPress={() => navigation.navigate('ArticleWithSurvey', {
-                            title: '쿠팡 동탄 물류센터서 30대 근로자 사망...사측 "지병 있어"',
-                            imageUrl: 'https://via.placeholder.com/300x160',
-                            category: '사회',
-                            time: '1시간 전'
-                        })}
-                    />
+                    {filteredNews.map((news) => (
+                        <ReportNewsItem
+                            key={news.newsId}
+                            category={news.category}
+                            time={news.latestTime}
+                            title={news.title}
+                            imageUrl={news.thumbnailUrl}
+                            badgeText="참여 완료" // Mock badge text as API doesn't provide it
+                            badgeColor="#E8F0FE"
+                            badgeTextColor="#1A73E8"
+                            onPress={() => navigation.navigate('NewsDetail', {
+                                newsId: news.newsId,
+                                title: news.title,
+                                imageUrl: news.thumbnailUrl,
+                                category: news.category,
+                                time: news.latestTime,
+                                content: news.content
+                            })}
+                        />
+                    ))}
                 </View>
 
                 <View style={{ height: 20 }} />

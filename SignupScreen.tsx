@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Image } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { authService } from './services/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SignupScreen({ navigation }: { navigation: any }) {
     const [id, setId] = useState('');
@@ -29,6 +31,32 @@ export default function SignupScreen({ navigation }: { navigation: any }) {
         }
 
         setBirthdate(formatted);
+    };
+
+    const handleSignup = async () => {
+        if (!id || !password || !nickname || !birthdate) {
+            alert('모든 정보를 입력해주세요.');
+            return;
+        }
+
+        try {
+            const signupData = {
+                loginId: id,
+                password: password,
+                nickname: nickname,
+                birth: birthdate
+            };
+
+            const response = await authService.signup(signupData);
+            await AsyncStorage.setItem('accessToken', response.accessToken);
+            if (response.refreshToken) {
+                await AsyncStorage.setItem('refreshToken', response.refreshToken);
+            }
+            navigation.replace('Home');
+        } catch (error) {
+            console.error(error);
+            alert('회원가입에 실패했습니다. 다시 시도해주세요.');
+        }
     };
 
     return (
@@ -103,7 +131,7 @@ export default function SignupScreen({ navigation }: { navigation: any }) {
                     </View>
 
                     <View style={styles.footer}>
-                        <TouchableOpacity style={styles.signupButton}>
+                        <TouchableOpacity style={styles.signupButton} onPress={handleSignup}>
                             <Text style={styles.signupButtonText}>가입하기</Text>
                         </TouchableOpacity>
                     </View>
