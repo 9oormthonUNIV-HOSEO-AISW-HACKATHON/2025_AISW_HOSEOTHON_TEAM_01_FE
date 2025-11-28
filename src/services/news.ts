@@ -1,57 +1,12 @@
 import api from './api';
-
-export interface NewsItem {
-    newsId: number;
-    title: string;
-    thumbnailUrl: string;
-    category: string;
-    latestTime: string;
-    content?: string;
-}
-
-export interface NewsListResponse {
-    newsList: NewsItem[];
-}
-
-export interface NewsDetailResponse {
-    title: string;
-    thumbnailUrl: string;
-    category: string;
-    latestTime: string;
-    content: string;
-    reportBlur: boolean;
-}
-
-export interface SurveyQuestion {
-    surveyNum: number;
-    surveyQuestion: string;
-}
-
-export interface SurveyAnswerRequest {
-    newsId: string;
-    q1Answer: string;
-    q2Answer: string;
-    q3Answer: string;
-    q4Answer: string;
-    q5Answer: string;
-}
-
-export interface GenerationAspect {
-    generation: string;
-    firstAspect: string;
-    firstAspectReason: string;
-    secondAspect: string;
-    secondAspectReason: string;
-    thirdAspect: string;
-    thirdAspectReason: string;
-}
-
-export interface SurveyStatisticsResponse {
-    newsId: number;
-    commonAspect: string;
-    aspectReason: string;
-    generationAspectList: GenerationAspect[];
-}
+import type {
+    NewsItem,
+    NewsListResponse,
+    NewsDetailResponse,
+    SurveyQuestion,
+    SurveyAnswerRequest,
+    SurveyStatisticsResponse,
+} from '../types';
 
 export const newsService = {
     // GET /News
@@ -88,4 +43,14 @@ export const newsService = {
         const response = await api.get<boolean>(`/survey/check/${newsId}`);
         return response.data;
     },
+};
+
+// Re-export types for backward compatibility
+export type {
+    NewsItem,
+    NewsListResponse,
+    NewsDetailResponse,
+    SurveyQuestion,
+    SurveyAnswerRequest,
+    SurveyStatisticsResponse
 };

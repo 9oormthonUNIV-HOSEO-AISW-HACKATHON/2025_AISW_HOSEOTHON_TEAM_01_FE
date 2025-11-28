@@ -122,7 +122,7 @@ export default function ArticleWithSurveyScreen({ route, navigation }: { route: 
             {/* Header from NewsDetailScreen */}
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <Image source={require('./assets/back.png')} style={styles.backIcon} resizeMode="contain" />
+                    <Image source={require('../../assets/back.png')} style={styles.backIcon} resizeMode="contain" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle} numberOfLines={1}>{title}</Text>
             </View>

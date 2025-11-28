@@ -40,7 +40,7 @@ export default function StartScreen({ navigation }: { navigation: any }) {
 
     return (
         <ImageBackground
-            source={require('./assets/Splash screen.png')}
+            source={require('../../assets/Splash screen.png')}
             style={styles.container}
             onLayout={onLayoutRootView}
             resizeMode="cover"
@@ -48,7 +48,7 @@ export default function StartScreen({ navigation }: { navigation: any }) {
             <View style={styles.contentContainer}>
                 <View style={styles.logoContainer}>
                     <Image
-                        source={require('./assets/splash-icon.png')}
+                        source={require('../../assets/splash-icon.png')}
                         style={styles.logo}
                         resizeMode="contain"
                     />

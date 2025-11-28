@@ -1,10 +1,10 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const BASE_URL = 'http://10.0.2.2:8080/api/v1'; // Android Emulator localhost. Change to your API URL.
+import { API_CONFIG } from '../constants/config';
 
 const api = axios.create({
-    baseURL: BASE_URL,
+    baseURL: API_CONFIG.BASE_URL,
+    timeout: API_CONFIG.TIMEOUT,
     headers: {
         'Content-Type': 'application/json',
     },
@@ -19,15 +19,9 @@ api.interceptors.request.use(
 
         if (!isSkipAuth) {
             const token = await AsyncStorage.getItem('accessToken');
-            console.log('[API] Interceptor - Token:', token);
             if (token) {
                 config.headers.Authorization = `Bearer ${token}`;
-                console.log('[API] Setting Authorization header');
-            } else {
-                console.log('[API] No token found in AsyncStorage');
             }
-        } else {
-            console.log('[API] Skipping Authorization header for:', config.url);
         }
         return config;
     },
@@ -51,7 +45,7 @@ api.interceptors.response.use(
                     throw new Error('No refresh token');
                 }
 
-                const response = await axios.post(`${BASE_URL}/auth/access/reissue`, {
+                const response = await axios.post(`${API_CONFIG.BASE_URL}/auth/access/reissue`, {
                     refreshToken: refreshToken,
                 });
 
@@ -67,7 +61,6 @@ api.interceptors.response.use(
             } catch (refreshError) {
                 // Refresh failed - logout user
                 await AsyncStorage.multiRemove(['accessToken', 'refreshToken']);
-                // You might want to navigate to login screen here or handle it in the UI
                 return Promise.reject(refreshError);
             }
         }

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { userService, ReportResponse } from './services/user';
+import { userService, ReportResponse } from '../services/user';
 
 const { width } = Dimensions.get('window');
 

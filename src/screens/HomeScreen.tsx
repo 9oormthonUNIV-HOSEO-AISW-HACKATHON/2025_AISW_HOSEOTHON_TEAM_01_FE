@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import NewsCard from './components/NewsCard';
+import NewsCard from '../components/NewsCard';
 import ReportScreen from './ReportScreen';
-import { newsService, NewsItem } from './services/news';
+import { newsService, NewsItem } from '../services/news';
 
 const { width } = Dimensions.get('window');
 
@@ -151,7 +151,7 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
                 <Image
-                    source={require('./assets/splash-icon.png')}
+                    source={require('../../assets/splash-icon.png')}
                     style={styles.logo}
                     resizeMode="contain"
                 />
@@ -168,7 +168,7 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
             <View style={styles.bottomNav}>
                 <TouchableOpacity style={styles.navItem} onPress={() => setActiveTab('home')}>
                     <Image
-                        source={activeTab === 'home' ? require('./assets/homeicon.png') : require('./assets/n_home_cion.png')}
+                        source={activeTab === 'home' ? require('../../assets/homeicon.png') : require('../../assets/n_home_cion.png')}
                         style={styles.navIcon}
                         resizeMode="contain"
                     />
@@ -176,7 +176,7 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.navItem} onPress={() => setActiveTab('news')}>
                     <Image
-                        source={activeTab === 'news' ? require('./assets/news_icon.png') : require('./assets/n_news_icon.png')}
+                        source={activeTab === 'news' ? require('../../assets/news_icon.png') : require('../../assets/n_news_icon.png')}
                         style={styles.navIcon}
                         resizeMode="contain"
                     />
@@ -184,7 +184,7 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.navItem} onPress={() => setActiveTab('report')}>
                     <Image
-                        source={activeTab === 'report' ? require('./assets/report_icon.png') : require('./assets/n_report_icon.png')}
+                        source={activeTab === 'report' ? require('../../assets/report_icon.png') : require('../../assets/n_report_icon.png')}
                         style={styles.navIcon}
                         resizeMode="contain"
                     />
@@ -192,7 +192,7 @@ export default function HomeScreen({ navigation }: { navigation: any }) {
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('MyPage')}>
                     <Image
-                        source={activeTab === 'mypage' ? require('./assets/mypage_icon.png') : require('./assets/n_mypage_icon.png')}
+                        source={activeTab === 'mypage' ? require('../../assets/mypage_icon.png') : require('../../assets/n_mypage_icon.png')}
                         style={styles.navIcon}
                         resizeMode="contain"
                     />

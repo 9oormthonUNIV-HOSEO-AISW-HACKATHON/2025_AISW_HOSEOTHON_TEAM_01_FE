@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { authService } from './services/auth';
+import { authService } from '../services/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LoginScreen({ navigation }: { navigation: any }) {
@@ -34,13 +34,13 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
                 <ScrollView contentContainerStyle={styles.scrollContainer}>
                     <View style={styles.header}>
                         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                            <Image source={require('./assets/back.png')} style={styles.backIcon} resizeMode="contain" />
+                            <Image source={require('../../assets/back.png')} style={styles.backIcon} resizeMode="contain" />
                         </TouchableOpacity>
                     </View>
 
                     <View style={styles.logoContainer}>
                         <Image
-                            source={require('./assets/logo2.png')}
+                            source={require('../../assets/logo2.png')}
                             style={styles.logo}
                             resizeMode="contain"
                         />

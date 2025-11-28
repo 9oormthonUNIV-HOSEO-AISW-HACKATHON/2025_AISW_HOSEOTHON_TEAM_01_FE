@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { userService, MyPageResponse } from './services/user';
-import { authService } from './services/auth';
+import { userService, MyPageResponse } from '../services/user';
+import { authService } from '../services/auth';
 
 export default function MyPageScreen({ navigation }: { navigation: any }) {
     const [userInfo, setUserInfo] = useState<MyPageResponse | null>(null);
@@ -38,13 +38,13 @@ export default function MyPageScreen({ navigation }: { navigation: any }) {
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
                     <Image
-                        source={require('./assets/back.png')}
+                        source={require('../../assets/back.png')}
                         style={styles.backIcon}
                         resizeMode="contain"
                     />
                 </TouchableOpacity>
                 <Image
-                    source={require('./assets/splash-icon.png')}
+                    source={require('../../assets/splash-icon.png')}
                     style={styles.logo}
                     resizeMode="contain"
                 />
@@ -57,7 +57,7 @@ export default function MyPageScreen({ navigation }: { navigation: any }) {
                 <View style={styles.profileCard}>
                     <View style={styles.profileImageContainer}>
                         <Image
-                            source={require('./assets/apeach.png')}
+                            source={require('../../assets/apeach.png')}
                             style={styles.profileImage}
                         />
                     </View>

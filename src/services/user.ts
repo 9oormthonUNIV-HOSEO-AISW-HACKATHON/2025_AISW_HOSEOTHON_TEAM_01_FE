@@ -1,5 +1,5 @@
 import api from './api';
-import { NewsItem } from './news';
+import type { NewsItem } from '../types/news';
 
 export interface MyPageResponse {
     nickName: string;

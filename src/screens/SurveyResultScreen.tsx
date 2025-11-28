@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity } from 'rea
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { newsService, SurveyStatisticsResponse } from './services/news';
+import { newsService, SurveyStatisticsResponse } from '../services/news';
 
 export default function SurveyResultScreen({ route, navigation }: { route: any, navigation: any }) {
     const { newsId, title } = route.params || {};
@@ -74,7 +74,7 @@ export default function SurveyResultScreen({ route, navigation }: { route: any, 
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
                 <Image
-                    source={require('./assets/splash-icon.png')}
+                    source={require('../../assets/splash-icon.png')}
                     style={styles.logo}
                     resizeMode="contain"
                 />

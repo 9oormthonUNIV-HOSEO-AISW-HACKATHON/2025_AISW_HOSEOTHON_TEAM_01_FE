@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, SafeAreaView, Dimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView as SafeAreaContext } from 'react-native-safe-area-context';
-import { newsService } from './services/news';
+import { newsService } from '../services/news';
 
 const { width } = Dimensions.get('window');
 
@@ -53,7 +53,7 @@ export default function NewsDetailScreen({ route, navigation }: { route: any, na
         <SafeAreaContext style={styles.container}>
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <Image source={require('./assets/back.png')} style={styles.backIcon} resizeMode="contain" />
+                    <Image source={require('../../assets/back.png')} style={styles.backIcon} resizeMode="contain" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle} numberOfLines={1}>{title}</Text>
             </View>
@@ -75,7 +75,7 @@ export default function NewsDetailScreen({ route, navigation }: { route: any, na
 
                 <View style={styles.footerContainer}>
                     <Image
-                        source={require('./assets/Blur.png')}
+                        source={require('../../assets/Blur.png')}
                         style={styles.footerBackground}
                     />
                     <View style={styles.footerOverlay}>

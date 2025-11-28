@@ -1,15 +1,15 @@
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import StartScreen from './StartScreen';
-import SignupScreen from './SignupScreen';
-import LoginScreen from './LoginScreen';
-import HomeScreen from './HomeScreen';
-import NewsDetailScreen from './NewsDetailScreen';
-import MyPageScreen from './MyPageScreen';
-import SurveyScreen from './SurveyScreen';
-import SurveyResultScreen from './SurveyResultScreen';
-import ArticleWithSurveyScreen from './ArticleWithSurveyScreen';
+import StartScreen from './src/screens/StartScreen';
+import SignupScreen from './src/screens/SignupScreen';
+import LoginScreen from './src/screens/LoginScreen';
+import HomeScreen from './src/screens/HomeScreen';
+import NewsDetailScreen from './src/screens/NewsDetailScreen';
+import MyPageScreen from './src/screens/MyPageScreen';
+import SurveyScreen from './src/screens/SurveyScreen';
+import SurveyResultScreen from './src/screens/SurveyResultScreen';
+import ArticleWithSurveyScreen from './src/screens/ArticleWithSurveyScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -66,4 +66,3 @@ export default function App() {
     </NavigationContainer>
   );
 }
-

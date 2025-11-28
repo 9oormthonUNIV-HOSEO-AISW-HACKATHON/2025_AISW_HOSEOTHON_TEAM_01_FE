@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { newsService, SurveyQuestion } from './services/news';
+import { newsService, SurveyQuestion } from '../services/news';
 
 export default function SurveyScreen({ route, navigation }: { route: any, navigation: any }) {
     const { newsId, title } = route.params || {};
@@ -68,10 +68,10 @@ export default function SurveyScreen({ route, navigation }: { route: any, naviga
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <Image source={require('./assets/back.png')} style={styles.backIcon} resizeMode="contain" />
+                    <Image source={require('../../assets/back.png')} style={styles.backIcon} resizeMode="contain" />
                 </TouchableOpacity>
                 <Image
-                    source={require('./assets/splash-icon.png')}
+                    source={require('../../assets/splash-icon.png')}
                     style={styles.headerLogo}
                     resizeMode="contain"
                 />

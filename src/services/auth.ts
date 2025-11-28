@@ -1,22 +1,6 @@
 import api from './api';
+import type { LoginRequest, SignupRequest, AuthResponse } from '../types/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-export interface LoginRequest {
-    loginId: string;
-    password: string;
-}
-
-export interface SignupRequest {
-    loginId: string;
-    password: string;
-    nickname: string;
-    birth: string; // yyyy-MM-dd
-}
-
-export interface AuthResponse {
-    accessToken: string;
-    refreshToken: string;
-}
 
 export const authService = {
     login: async (data: LoginRequest): Promise<AuthResponse> => {
